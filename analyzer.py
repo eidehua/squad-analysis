@@ -11,7 +11,7 @@ reasoning_wrong = Counter()
 
 
 def labeled_analyzer():
-	"""equires correct/incorrect to be labeled"""
+	"""requires correct/incorrect to be labeled"""
 	with open('data/labeled-dev.json') as labeled_file:
 		labeled_data = json.load(labeled_file)
 		#labled_data['data'][article_index]['paragraphs'][paragraph_index]['qas']
@@ -79,12 +79,15 @@ def auto_analyzer():
 						#print(prediction_tuple)
 						#print(qa['id'])
 						prediction = ""
-						with open('data/sorted-ensemble.json') as data_file:
+						with open('data/mpm-single-prediction.json') as data_file:
 							data = json.load(data_file)
 							for id in data:
-								if id == qa['id']:
+								cleaned_id = id.split("-")[0]
+								if cleaned_id == qa['id']:
 									prediction = data[id]
 						# ground truths for this particular question
+						if prediction == "":
+							continue
 						ground_truths = map(lambda x: x['text'], qa['answers'])
 						#prediction = prediction_tuple[1]
 						if is_ground_truth(prediction, ground_truths):
@@ -103,7 +106,7 @@ def auto_analyzer():
 	print(categories_wrong)
 	print(reasoning_correct)
 	print(reasoning_wrong)
-	with open('out/bidaf-error.csv', 'w') as csv_file:
+	with open('out/mpm-single-error.csv', 'w') as csv_file:
 		writer=csv.writer(csv_file)
 		 
 		writer.writerow(categories_correct.keys())
